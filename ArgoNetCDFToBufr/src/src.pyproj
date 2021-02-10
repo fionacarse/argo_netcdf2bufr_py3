@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{b78a5310-2abb-4962-8e6e-16f3d7f8b291}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>argonetcdftobufr.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
+    <Name>src</Name>
+    <InterpreterArguments>
+    </InterpreterArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <CommandLineArguments>-d -i "../../../Info from Jon Turton/Addition of Salinity and Oxygen profiles/Final Testing/R6901926_144.nc" -o "../../../Info from Jon Turton/Addition of Salinity and Oxygen profiles/Final Testing/R6901926_144.dat"</CommandLineArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ArgoNetCDFBufrEncoder.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="argonetcdftobufr.py" />
+    <Compile Include="bufr\BufrEncoder.py" />
+    <Compile Include="bufr\BufrBitArray.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXYDelayedReplication.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXYDoubleReplication.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXY.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXYDouble.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXYInt.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXYIntReplication.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXYTemplate.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\BufrFXYString.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\Tests\testBufrEncoder.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\Tests\testBufrFXYDoubleReplication.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\Tests\testBufrFXYInt.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\Tests\testBufrFXYString.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="bufr\__init__.py" />
+    <Compile Include="channels\Channel.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="channels\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ncdump.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NetCDFDecoder.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="simple_xy_wr.py" />
+    <Compile Include="bufr\Tests\testBufrFXYDouble.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bufr\" />
+    <Folder Include="bufr\Tests\" />
+    <Folder Include="channels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|2.7-32" />
+    <InterpreterReference Include="Global|PythonCore|3.5-32" />
+    <InterpreterReference Include="Global|PythonCore|3.6" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
