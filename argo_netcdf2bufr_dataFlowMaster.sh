@@ -39,7 +39,7 @@ UNBUFR=argobufr
 PWBUFR=4rg0bufr
 
 # set an acceptable age for profiles, in days
-acceptableAge=30.0
+acceptableAge=56.0
 
 # Configure FTP settings for sending netCDF files to external-facing FTP site
 
@@ -72,7 +72,7 @@ if [[ ${countfilesA} -gt 0 ]]
 then
   for i in ${NCDEST}/${ascFileString}
   do
-    # check age of file is less than 30 days: 0 means False ie not too old; 
+    # check age of file is less than 56 days: 0 means False ie not too old; 
     #  1 means True, too old, do not process.
     tooOld=$(python test_ob_age.py ${i} ${acceptableAge})
     if [[ ${tooOld} -eq 1 ]]
@@ -106,7 +106,7 @@ if [[ ${countfilesD} -gt 0 ]]
 then
   for i in ${NCDEST}/${dscFileString}
   do
-    # check age of file is less than 30 days: 0 means False ie not too old; 
+    # check age of file is less than 56 days: 0 means False ie not too old; 
     #  1 means True, too old, do not process.
     tooOld=$(python test_ob_age.py ${i} ${acceptableAge})
     if [[ ${tooOld} -eq 1 ]]
