@@ -24,6 +24,7 @@ DATATOPDIR=/data/local/marinedg/argo/netcdf_py3
 NCDEST=$DATATOPDIR/incoming
 BUFRDEST=$DATATOPDIR/outgoing/bufr
 PROCESSEDNCDIR=${NCDEST}/processed
+UNPROCESSEDNCDIR=${NCDEST}/unprocessed
 PROCESSEDBUFRDIR=${BUFRDEST}/processed
 TOOOLDNCDIR=${NCDEST}/unprocessed
 
@@ -191,7 +192,8 @@ then
     else
       arrayofnetcdffilesnotproc+=("$fl")
       countnetcdfnotprocessed=$(( $countnetcdfnotprocessed+1 ))
-      echo -e "$fl was not processed successfully"
+      mv ${file} ${UNPROCESSEDNCDIR}
+      echo -e "$fl was not processed successfully, moved to ${UNPROCESSEDNCDIR}"
     fi
   done
 else
@@ -213,7 +215,8 @@ then
     else
       arrayofnetcdffilesnotproc+=("$fl")
       countnetcdfnotprocessed=$(( $countnetcdfnotprocessed+1 ))
-      echo -e "$fl was not processed successfully"
+      mv ${file} ${UNPROCESSEDNCDIR}
+      echo -e "$fl was not processed successfully, moved to ${UNPROCESSEDNCDIR}"
     fi
   done
 else
