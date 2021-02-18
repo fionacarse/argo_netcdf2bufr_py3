@@ -26,15 +26,15 @@ WORKING=${DATATOPDIR}/archive
 SRC_BUFR=${DATATOPDIR}/outgoing/bufr/processed
 SRC_NETCDF=${DATATOPDIR}/incoming/processed
 MOO_BASE=moo:/adhoc/users/marinedg/argo
-MOO_BUFR=bufr
+MOO_BUFR=bufr_py3
 emailToList="fiona.carse@metoffice.gov.uk jon.turton@metoffice.gov.uk"
-emailSubject="Archiving failure report from Argo netcdf2bufr system on exvmarproc01"
+emailSubject="Archiving failure report from Argo netcdf2bufr py3 system on exvmarproc01"
 
 # 0. Start monthly archiving run
 dtnow=$(date +%Y%m%d_%H:%M)
 echo --
 echo --
-echo -- Starting monthly archiving run for Argo BUFR data, commencing ${dtnow}.
+echo -- Starting monthly archiving run for Argo BUFR py3 data, commencing ${dtnow}.
 echo --
 echo --
 
@@ -87,7 +87,7 @@ if [ "${c_argobufrfiles}" -gt "0" ]; then
       echo ${tarfilename1} arrived in MASS OK, remove tar.gz file and tmp folder from exvmarproc01
       rm -r tmp/
       rm ${tarfilename1}
-      echo "Archiving argo BUFR worked well" | mail -s "argo bufr archiving worked well" fiona.carse@metoffice.gov.uk 
+      echo "Archiving argo BUFR py3 worked well" | mail -s "argo bufr py3 archiving worked well" fiona.carse@metoffice.gov.uk 
     else
       echo ${tarfilename1} did not arrive in MASS. 
       echo Move raw data files back to original location, remove tmp/ and tar.gz file 
@@ -98,7 +98,7 @@ if [ "${c_argobufrfiles}" -gt "0" ]; then
       done
       rm -r tmp/
       rm ${tarfilename1}
-      emailbodytext="The monthly archiving of BUFR files from the netCDF to BUFR processing system on exvmarproc01 has failed for year ${onemonthago_y}, month ${onemonthago_m}. The BUFR files have not been stored in MASS, leaving ${c_argobufrfiles_1} BUFR files in folder ${SRC_BUFR} in exvmarproc01. A build-up of small files can lead to failure of all processing (not just Argo) on exvmarproc01, because the machine has a finite starage capacity and also a finite number of i-nodes available. Please try to manually re-run the archiving script, which is here: ${SCRIPTDIR}/argo_netcdf2bufr_archiving.sh "
+      emailbodytext="The monthly archiving of BUFR files from the netCDF to BUFR py3 processing system on exvmarproc01 has failed for year ${onemonthago_y}, month ${onemonthago_m}. The BUFR files have not been stored in MASS, leaving ${c_argobufrfiles_1} BUFR files in folder ${SRC_BUFR} in exvmarproc01. A build-up of small files can lead to failure of all processing (not just Argo) on exvmarproc01, because the machine has a finite starage capacity and also a finite number of i-nodes available. Please try to manually re-run the archiving script, which is here: ${SCRIPTDIR}/argo_netcdf2bufr_archiving.sh "
       echo "${emailbodytext}" | mail -s "${emailSubject}" ${emailToList}
     fi 
   fi
@@ -125,7 +125,7 @@ if [ "${c_argobufrfiles}" -gt "0" ]; then
       echo ${tarfilename2} arrived in MASS OK, remove tar.gz file and tmp folder from exvmarproc01
       rm -r tmp/
       rm ${tarfilename2}
-      echo "Archiving argo BUFR worked well" | mail -s "argo bufr archiving worked well" fiona.carse@metoffice.gov.uk 
+      echo "Archiving argo BUFR py3 worked well" | mail -s "argo bufr py3 archiving worked well" fiona.carse@metoffice.gov.uk 
     else
       echo ${tarfilename2} did not arrive in MASS. 
       echo Move raw data files back to original location, remove tmp/ and tar.gz file 
@@ -136,7 +136,7 @@ if [ "${c_argobufrfiles}" -gt "0" ]; then
       done
       rm -r tmp/
       rm ${tarfilename2}
-      emailbodytext="The monthly archiving of BUFR files from the netCDF to BUFR processing system on exvmarproc01 has failed for year ${twomonthsago_y}, month ${twomonthsago_m}. The BUFR files have not been stored in MASS, leaving ${c_argobufrfiles_2} BUFR files in folder ${SRC_BUFR} in exvmarproc01. A build-up of small files can lead to failure of all processing (not just Argo) on exvmarproc01, because the machine has a finite starage capacity and also a finite number of i-nodes available. Please try to manually re-run the archiving script, which is here: ${SCRIPTDIR}/argo_netcdf2bufr_archiving.sh "
+      emailbodytext="The monthly archiving of BUFR files from the netCDF to BUFR py3 processing system on exvmarproc01 has failed for year ${twomonthsago_y}, month ${twomonthsago_m}. The BUFR files have not been stored in MASS, leaving ${c_argobufrfiles_2} BUFR files in folder ${SRC_BUFR} in exvmarproc01. A build-up of small files can lead to failure of all processing (not just Argo) on exvmarproc01, because the machine has a finite starage capacity and also a finite number of i-nodes available. Please try to manually re-run the archiving script, which is here: ${SCRIPTDIR}/argo_netcdf2bufr_archiving.sh "
       echo "${emailbodytext}" | mail -s "${emailSubject}" ${emailToList}
     fi 
   fi
@@ -150,7 +150,7 @@ cd -
 dtnow=$(date +%Y%m%d_%H:%M)
 echo --
 echo --
-echo -- Ending monthly archiving run for Argo netcdf2bufr data, finished running at ${dtnow}.
+echo -- Ending monthly archiving run for Argo netcdf2bufr_py3 data, finished running at ${dtnow}.
 echo --
 echo --
 
