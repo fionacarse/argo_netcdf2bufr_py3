@@ -34,8 +34,9 @@ ascFileString="R*_*[0-9].nc"
 dscFileString="R*_*[0-9]D.nc"
 
 # Configure FTP settings for sending BUFR files to MetDB
-#REMOTEHOSTBUFR=exxmetswitchprod
-REMOTEHOSTBUFR=exxmetswitchdev
+# changed to prod on 26/05/21 - also switched off py2 version this same day
+REMOTEHOSTBUFR=exxmetswitchprod
+#REMOTEHOSTBUFR=exxmetswitchdev
 UNBUFR=argobufr
 PWBUFR=4rg0bufr
 
