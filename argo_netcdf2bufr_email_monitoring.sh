@@ -39,7 +39,7 @@ todayHM=$(date +%d/%m/%Y_%H:%M)
 totalNC=$(awk '{ sum += $1 } END { print sum }' ${filenameH}) 
 totalBUFR=$(awk '{ sum += $7 } END { print sum }' ${filenameH})
 emailbodytextH="${totalNC} netCDF files processed into ${totalBUFR} BUFR messages in the 24 hours up to ${todayHM}."
-echo "${emailbodytextH}" | mail -a ${filenameFLH} -s "report from Py3-Test-System Argo netCDF-to-BUFR processing on exvmarproc01" ${emailToList} 
+echo "${emailbodytextH}" | mail -a ${filenameFLH} -s "report from Argo netCDF-to-BUFR py3 processing on exvmarproc01" ${emailToList} 
 
 # 3. FTP list of netCDF files and email body text file to DART
 # attachment file will be ${filenameFLH}
