@@ -95,7 +95,6 @@ class ArgoNetCDFBufrEncoder(BufrEncoder):
         # add any additional bufr templates for other Argo profiles
         self.additionalProfiles = []
         numProfiles = argoChannels["N_PROF"].value
-        #numProfiles = 1 #//??
         if numProfiles>1:
             samplingSchemesInFile = argoChannels["VERTICAL_SAMPLING_SCHEME"].value
             # check that primary is first
@@ -107,8 +106,10 @@ class ArgoNetCDFBufrEncoder(BufrEncoder):
                     profileNamePrefix = "Complimentary" + str(profileNo)    # used for keeping the keys unique for all profiles
                     # save a list of tuples for the additional profiles, for use when adding the data
                     salinity = argoChannels["PSAL"].value[profileNo]
+                    oxygen = argoChannels["DOXY"].value[profileNo]
+                    oxygenAvailable = oxygen.count() > 0    # include oxygen if there are some values which are not masked
                     salinityAvailable = salinity.count() > 0    # include salinity if there are some values which are not masked
-                    self.additionalProfiles.append((profileNamePrefix, profileNo, samplingScheme.rstrip(), salinityAvailable))
+                    self.additionalProfiles.append((profileNamePrefix, profileNo, samplingScheme.rstrip(), salinityAvailable, oxygenAvailable))
                     if salinityAvailable:
                         self.addSupplementaryPressureSalinityProfile(profileNamePrefix)
                     else:
@@ -334,6 +335,7 @@ class ArgoNetCDFBufrEncoder(BufrEncoder):
         if self.DissolvedOxygenProfile:
 
             key = self.DissolvedOxygenProfile
+            profile = 0 # oxygen will always be profile 0
 
             pressure = self.channels["PRES"].value[profile]
             dissolvedOxygen = self.channels["DOXY"].value[profile]
@@ -344,17 +346,33 @@ class ArgoNetCDFBufrEncoder(BufrEncoder):
                self.getValidData([pressure, dissolvedOxygen, pressureQC, dissolvedOxygenQC])
             validPoints = pressureValidPoints.size
 
+            print("Dissolved Oxygen is present in main profile")
             print("Pressure channel has " + str(validPoints) + " valid values out of " + str(pressure.size))
             print("Dissolved oxygen channel has " + str(validPoints) + " valid values out of " + str(dissolvedOxygen.size))
 
+            # look for additional profiles with oxygen data
+            for additionalProfile in enumerate(self.additionalProfiles):
+
+                oxygenAvailable = additionalProfile[1][4]
+                if oxygenAvailable:
+                    [pressureValidPointsAdd, dissolvedOxygenValidPointsAdd, pressureValidPointsQCAdd, dissolvedOxygenValidPointsQCAdd] =\
+                        self.getValidDataFromChannelsInProfile(additionalProfile[1][1], ["PRES", "DOXY", "PRES_QC", "DOXY_QC"])
+
+                print("Dissolved Oxygen is present in additional profile " + additionalProfile[1][2])
+                print("Pressure channel has " + str(pressureValidPointsAdd.size) + " valid values")
+                print("Dissolved oxygen channel has " + str(dissolvedOxygenValidPointsAdd.size) + " valid values")
+
+                # insert additional points into data
+                [pressureValidPoints, dissolvedOxygenValidPoints, pressureValidPointsQC, dissolvedOxygenValidPointsQC] =\
+                    self.insertData(pressureValidPoints, [dissolvedOxygenValidPoints, pressureValidPointsQC, dissolvedOxygenValidPointsQC], \
+                    pressureValidPointsAdd, [dissolvedOxygenValidPointsAdd, pressureValidPointsQCAdd, dissolvedOxygenValidPointsQCAdd])
+
+            validPoints = pressureValidPoints.size
             levels = int(validPoints)
-            profile = 0 # oxygen will always be profile 0
             self.getDataDescription(key + "ExtendedDelayedReplication").setValue(levels)
 
             # check dimensions are OK
-            if pressure.size != levels:
-                raise Exception("The number of levels in the main file (" + str(levels) + ") and bio file (" + str(pressure.count) + ") must be the same")
-            if pressure.size != dissolvedOxygen.size:
+            if validPoints != dissolvedOxygenValidPoints.size:
                 raise Exception("The number of levels in the Pressure channel (in the main file) and Oxygen channel (in the bio file) must be the same")
 
             self.getDataDescription(key + "Depth").setValue([None] * levels)  # degC
@@ -431,5 +449,58 @@ class ArgoNetCDFBufrEncoder(BufrEncoder):
                 for idx, channel in enumerate(inputChannels):
                     result[idx][validPoints] = channel.data[i]
                 validPoints = validPoints + 1
+
+        return result
+
+    def getValidDataFromChannelsInProfile(self, profile:int, inputChannelNames:Tuple) -> Tuple:
+        # get the channels
+        inputChannels = []
+        for channelName in inputChannelNames:
+            channel = self.channels[channelName].value[profile]
+            inputChannels.append(channel)
+
+        # return the valid data
+        return self.getValidData(inputChannels)
+
+    def insertData(self, inputChannel, inputChannels:Tuple, inputChannelAdd, inputChannelsAdd:Tuple) -> Tuple:
+        # check input
+        size = inputChannel.size
+        for channel in inputChannels:
+            if size != channel.size:
+                raise Exception("All inputs must be the same size")
+            size = channel.size
+
+        sizeAdd = inputChannelAdd.size
+        for channel in inputChannelsAdd:
+            if sizeAdd != channel.size:
+                raise Exception("All additional inputs must be the same size")
+            sizeAdd = channel.size
+
+        if len(inputChannels) != len(inputChannelsAdd):
+            raise Exception("Additional inputs must be the same number of channels as existing")
+
+        # allocate new arrays
+        validPoints = size + sizeAdd
+        result = []
+        result.append(np.empty(validPoints, inputChannel.dtype))
+        for channel in inputChannels:
+            result.append(np.empty(validPoints, channel.dtype))
+
+        # insert the additional data at the right position
+        orig = 0
+        additional = 0
+        for i in range(validPoints):
+            if additional >= inputChannelAdd.size or inputChannel[orig] < inputChannelAdd[additional]:
+                # copy point from original data
+                result[0][i] = inputChannel.data[orig]
+                for idx, channel in enumerate(inputChannels):
+                    result[idx + 1][i] = channel[orig]
+                orig = orig + 1
+            else:
+                # copy point from additional data
+                result[0][i] = inputChannelAdd.data[additional]
+                for idx, channel in enumerate(inputChannelsAdd):
+                    result[idx + 1][i] = channel[additional]
+                additional = additional + 1
 
         return result
