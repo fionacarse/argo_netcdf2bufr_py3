@@ -353,23 +353,24 @@ fi
 countBUFRfilestomove=$(ls ${BUFRDEST}/*.dat 2>/dev/null | wc -l)
 bufrfilestohandle=$(ls ${BUFRDEST}/*.dat 2>/dev/null)
 echo -e "\nFTPing ${countBUFRfilestomove} BUFR files to MetSwitch ${REMOTEHOSTBUFR}"
-#for f in ${bufrfilestohandle}
-#do
-#  bn=$(basename $f)
-#  ftp -n ${REMOTEHOSTBUFR} <<END_SCRIPT
-#  quote USER ${UNBUFR}
-#  quote PASS ${PWBUFR}
-#  put ${f} ${bn}.tmp  
-#  rename ${bn}.tmp ${bn}
-#  quit
-#END_SCRIPT
-#done
+for f in ${bufrfilestohandle}
+do
+  bn=$(basename $f)
+  ftp -n ${REMOTEHOSTBUFR} <<END_SCRIPT
+  quote USER ${UNBUFR}
+  quote PASS ${PWBUFR}
+  put ${f} ${bn}.tmp  
+  rename ${bn}.tmp ${bn}
+  quit
+END_SCRIPT
+done
 echo -e "Finished FTPing"
 
 # 5b. 
 # write line to text file so I can send myself a daily report email
 # the last line of this setcion sends me an hourly email. This is too much info, now that the daily email is working.
-emailbodytext="${countfiles} netCDF files were processed into ${countBUFRfilestomove} BUFR files. These BUFR files were sent to metswitch (${REMOTEHOSTBUFR}) at $(date +"%d/%m/%Y_%H:%M") - Python 3 operational system."
+#emailbodytext="${countfiles} netCDF files were processed into ${countBUFRfilestomove} BUFR files. These BUFR files were sent to metswitch (${REMOTEHOSTBUFR}) at $(date +"%d/%m/%Y_%H:%M") - Python 3 operational system."
+emailbodytext="${countfilesR} netCDF R files and ${countfilesBR} nc BR files were processed into ${countBUFRfilestomove} BUFR files. These BUFR files were sent to metswitch (${REMOTEHOSTBUFR}) at $(date +"%d/%m/%Y_%H:%M") - Python 3 operational system."
 #emailbodytext="${countfiles} netCDF files were processed into ${countBUFRfilestomove} BUFR files. These BUFR files were sent to metswitch (${REMOTEHOSTBUFR}) at $(date +"%d/%m/%Y_%H:%M")."
 echo "${emailbodytext}" >> hourly_report_argo_netcdf2bufr.txt 
 #echo "${emailbodytext}" | mail -s "report from Argo netCDF-to-BUFR py3 processing on exvmarproc01" fiona.carse@metoffice.gov.uk

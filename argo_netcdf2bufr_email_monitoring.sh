@@ -36,9 +36,11 @@ cd $HOME/bin/argo/netcdf2bufr_py3/
 # 2a. COUNTS Get info from hourly file and send email
 # 2b. FILES get info from hourly file and add to email.
 todayHM=$(date +%d/%m/%Y_%H:%M)
-totalNC=$(awk '{ sum += $1 } END { print sum }' ${filenameH}) 
-totalBUFR=$(awk '{ sum += $7 } END { print sum }' ${filenameH})
-emailbodytextH="${totalNC} netCDF files processed into ${totalBUFR} BUFR messages in the 24 hours up to ${todayHM}."
+#totalNC=$(awk '{ sum += $1 } END { print sum }' ${filenameH}) 
+totalNCR=$(awk '{ sum += $1 } END { print sum }' ${filenameH}) 
+totalNCBR=$(awk '{ sum += $6 } END { print sum }' ${filenameH}) 
+totalBUFR=$(awk '{ sum += $13 } END { print sum }' ${filenameH})
+emailbodytextH="${totalNCR} netCDF R files and ${totalNCBR} nc BR files processed into ${totalBUFR} BUFR messages in the 24 hours up to ${todayHM}."
 echo "${emailbodytextH}" | mail -a ${filenameFLH} -s "report from Argo netCDF-to-BUFR py3 processing on exvmarproc01" ${emailToList} 
 
 # 3. FTP list of netCDF files and email body text file to DART
