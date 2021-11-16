@@ -106,8 +106,10 @@ class ArgoNetCDFBufrEncoder(BufrEncoder):
                     profileNamePrefix = "Complimentary" + str(profileNo)    # used for keeping the keys unique for all profiles
                     # save a list of tuples for the additional profiles, for use when adding the data
                     salinity = argoChannels["PSAL"].value[profileNo]
-                    oxygen = argoChannels["DOXY"].value[profileNo]
-                    oxygenAvailable = oxygen.count() > 0    # include oxygen if there are some values which are not masked
+                    oxygenAvailable = False
+                    if "DOXY" in argoChannels.keys():
+                        oxygen = argoChannels["DOXY"].value[profileNo]
+                        oxygenAvailable = oxygen.count() > 0    # include oxygen if the channel exists and there are some values which are not masked
                     salinityAvailable = salinity.count() > 0    # include salinity if there are some values which are not masked
                     self.additionalProfiles.append((profileNamePrefix, profileNo, samplingScheme.rstrip(), salinityAvailable, oxygenAvailable))
                     if salinityAvailable:
@@ -363,6 +365,7 @@ class ArgoNetCDFBufrEncoder(BufrEncoder):
                 print("Dissolved oxygen channel has " + str(dissolvedOxygenValidPointsAdd.size) + " valid values")
 
                 # insert additional points into data
+                print("Inserting additional profile data into main profile...")
                 [pressureValidPoints, dissolvedOxygenValidPoints, pressureValidPointsQC, dissolvedOxygenValidPointsQC] =\
                     self.insertData(pressureValidPoints, [dissolvedOxygenValidPoints, pressureValidPointsQC, dissolvedOxygenValidPointsQC], \
                     pressureValidPointsAdd, [dissolvedOxygenValidPointsAdd, pressureValidPointsQCAdd, dissolvedOxygenValidPointsQCAdd])
