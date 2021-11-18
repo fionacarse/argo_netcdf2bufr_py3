@@ -381,7 +381,7 @@ ascFiles_bn=$(for a in $ascFiles;  do echo "$(basename $a)"; done)
 dscFiles_bn=$(for d in $dscFiles;  do echo "$(basename $d)"; done)
 ascBFiles_bn=$(for a in $ascBFiles;  do echo "$(basename $a)"; done)
 dscBFiles_bn=$(for d in $dscBFiles;  do echo "$(basename $d)"; done)
-echo "${ascFiles_bn}" "${dscFiles_bn}" "${ascBFiles_bn}" "${dscBFiles_bn}" >> hourly_report_netcdf_file_list.txt 
+echo "${ascFiles_bn}"$'\n'"${dscFiles_bn}"$'\n'"${ascBFiles_bn}"$'\n'"${dscBFiles_bn}" >> hourly_report_netcdf_file_list.txt 
 
 
 # 6.
