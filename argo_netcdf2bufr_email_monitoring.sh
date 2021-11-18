@@ -75,7 +75,7 @@ rm ${filenameFLH}
 touch ${filenameFLH} 
 
 # 5. append key numbers and date to daily file 
-csvFileText="${totalNC},${totalBUFR},${todayHM}"
+csvFileText="${totalNCR},${totalNCBR},${totalBUFR},${todayHM}"
 echo ${csvFileText} >> ${filenameD} 
 
 # 6. change back to original directory
