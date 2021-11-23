@@ -1,0 +1,1 @@
+7 netCDF files were processed into 6 BUFR files. These BUFR files were sent to metswitch (exxmetswitchprod) at 16/11/2021_09:41 - Python 3 operational system.

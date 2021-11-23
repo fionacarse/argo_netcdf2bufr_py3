@@ -1,10 +1,4 @@
-4 netCDF files were processed into 4 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_09:41 - Python 3 test system.
-5 netCDF files were processed into 5 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_11:51 - Python 3 test system.
-5 netCDF files were processed into 5 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_11:52 - Python 3 test system.
-5 netCDF files were processed into 5 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_11:54 - Python 3 test system.
-5 netCDF files were processed into 5 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_11:56 - Python 3 test system.
-2 netCDF files were processed into 2 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_13:55 - Python 3 test system.
-2 netCDF files were processed into 2 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_14:00 - Python 3 test system.
-4 netCDF files were processed into 4 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_15:41 - Python 3 test system.
-10 netCDF files were processed into 10 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 09/02/2021_21:41 - Python 3 test system.
-6 netCDF files were processed into 6 BUFR files. These BUFR files were sent to metswitch (exxmetswitchdev) at 10/02/2021_03:41 - Python 3 test system.
+5 netCDF R files and 0 nc BR files were processed into 5 BUFR files. These BUFR files were sent to metswitch (exxmetswitchprod) at 22/11/2021_09:41 - Python 3 operational system.
+10 netCDF R files and 0 nc BR files were processed into 10 BUFR files. These BUFR files were sent to metswitch (exxmetswitchprod) at 22/11/2021_15:41 - Python 3 operational system.
+11 netCDF R files and 0 nc BR files were processed into 11 BUFR files. These BUFR files were sent to metswitch (exxmetswitchprod) at 22/11/2021_21:41 - Python 3 operational system.
+4 netCDF R files and 1 nc BR files were processed into 4 BUFR files. These BUFR files were sent to metswitch (exxmetswitchprod) at 23/11/2021_03:41 - Python 3 operational system.

@@ -1,1 +1,1 @@
-48 netCDF files processed into 48 BUFR messages in the 24 hours up to 10/02/2021_09:00.
+30 netCDF R files and 1 nc BR files processed into 30 BUFR messages in the 24 hours up to 23/11/2021_09:00.

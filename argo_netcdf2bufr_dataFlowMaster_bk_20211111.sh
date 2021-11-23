@@ -19,11 +19,13 @@ SCRIPTDIR=/home/marinedg/bin/argo/netcdf2bufr_py3
 PYTHONCODEDIR=${SCRIPTDIR}/ArgoNetCDFToBufr/src
 PYTHONCODENAME=argonetcdftobufr.py
 WORKINGDATADIR=${SCRIPTDIR}/working/data
+#DATATOPDIR=/data/local/marinedg/argo/netcdf_py3/test_20200806
 DATATOPDIR=/data/local/marinedg/argo/netcdf_py3
-NCDEST=$DATATOPDIR/test_20200806/incoming
-BUFRDEST=$DATATOPDIR/test_20200806/outgoing/bufr
+NCDEST=$DATATOPDIR/incoming
+BUFRDEST=$DATATOPDIR/outgoing/bufr
 PROCESSEDNCDIR=${NCDEST}/processed
-PROCESSEDBUFRDIR=${BUFRDEST}/processed/py3
+UNPROCESSEDNCDIR=${NCDEST}/unprocessed
+PROCESSEDBUFRDIR=${BUFRDEST}/processed
 TOOOLDNCDIR=${NCDEST}/unprocessed
 
 # Set file name string variables 
@@ -32,10 +34,14 @@ ascFileString="R*_*[0-9].nc"
 dscFileString="R*_*[0-9]D.nc"
 
 # Configure FTP settings for sending BUFR files to MetDB
+# changed to prod on 26/05/21 - also switched off py2 version this same day
 REMOTEHOSTBUFR=exxmetswitchprod
 #REMOTEHOSTBUFR=exxmetswitchdev
 UNBUFR=argobufr
 PWBUFR=4rg0bufr
+
+# set an acceptable age for profiles, in days
+acceptableAge=56.0
 
 # Configure FTP settings for sending netCDF files to external-facing FTP site
 
@@ -59,34 +65,80 @@ echo -e " Started at "$(date +"%d/%m/%Y %H:%M:%S")"\n"
 cd ${SCRIPTDIR} 
 
 # 1.
-# List the files and check there are any available to be processed.
+# List the files and check there are any available to be processed (also check age).
+# check there are ascending files and move away any that are too old
+countTooOldFilesA=0
 countfilesA=0
-for i in ${NCDEST}/${ascFileString} 
-do 
-  test -f "$i" && 
-  echo Ascending profile files exist && 
-  #
-  # add python test here to check each file is less than 30 days old, move to TOOOLDNCDIR 
-  #
-  filestohandleA=$(ls ${NCDEST}/${ascFileString} 2>/dev/null) &&
-  countfilesA=$(ls -l ${NCDEST}/${ascFileString} 2>/dev/null | wc -l) &&
-  break
-done
+countfilesA=$(ls -l ${NCDEST}/${ascFileString} 2>/dev/null | wc -l) 
+if [[ ${countfilesA} -gt 0 ]]
+then
+  for i in ${NCDEST}/${ascFileString}
+  do
+    # check age of file is less than 56 days: 0 means False ie not too old; 
+    #  1 means True, too old, do not process.
+    tooOld=$(python test_ob_age.py ${i} ${acceptableAge})
+    if [[ ${tooOld} -eq 1 ]]
+    then
+      echo The profile in $i is too old, it will not be processed for distribution to MetDB or GTS.
+      countTooOldFilesA=${countTooOldFilesA}+1
+      mv ${i} ${TOOOLDNCDIR}
+    fi
+  done
+fi
+
+# count ascending files again, should be just the new-enough ones left
+countfilesA=$(ls -l ${NCDEST}/${ascFileString} 2>/dev/null | wc -l) 
+if [[ $countfilesA -gt 0 ]]
+then
+  for i in ${NCDEST}/${ascFileString} 
+  do 
+    test -f "$i" && 
+    echo Ascending profile files exist && 
+    filestohandleA=$(ls ${NCDEST}/${ascFileString} 2>/dev/null) &&
+    #countfilesA=$(ls -l ${NCDEST}/${ascFileString} 2>/dev/null | wc -l) &&
+    break
+  done
+fi
+
+# check there are descending files and move away any that are too old
+countTooOldFilesD=0
 countfilesD=0
-for i in ${NCDEST}/${dscFileString}
-do
-  test -f "$i" &&
-  echo Descending profile files exist && 
-  #
-  # add python test here to check each file is less than 30 days old, move to TOOOLDNCDIR
-  #
-  filestohandleD=$(ls ${NCDEST}/${dscFileString} 2>/dev/null) && 
-  countfilesD=$(ls -l ${NCDEST}/${dscFileString} 2>/dev/null | wc -l) &&
-  break
-done
+countfilesD=$(ls -l ${NCDEST}/${dscFileString} 2>/dev/null | wc -l)
+if [[ ${countfilesD} -gt 0 ]]
+then
+  for i in ${NCDEST}/${dscFileString}
+  do
+    # check age of file is less than 56 days: 0 means False ie not too old; 
+    #  1 means True, too old, do not process.
+    tooOld=$(python test_ob_age.py ${i} ${acceptableAge})
+    if [[ ${tooOld} -eq 1 ]]
+    then
+      echo The profile in $i is too old, it will not be processed for distribution to MetDB or GTS.
+      countTooOldFilesD=${countTooOldFilesD}+1
+      mv ${i} ${TOOOLDNCDIR}
+    fi
+  done
+fi
+
+# count descending files again, should be just the new-enough ones left
+countfilesD=$(ls -l ${NCDEST}/${dscFileString} 2>/dev/null | wc -l)
+if [[ $countfilesD -gt 0 ]]
+then
+  for i in ${NCDEST}/${dscFileString}
+  do
+    test -f "$i" &&
+    echo Descending profile files exist &&
+    filestohandleD=$(ls ${NCDEST}/${dscFileString} 2>/dev/null) &&
+    #countfilesD=$(ls -l ${NCDEST}/${dscFileString} 2>/dev/null | wc -l) &&
+    break
+  done
+fi
+
 countfiles=$(( ${countfilesA} + ${countfilesD} ))
+countTooOldFiles=$(( ${countTooOldFilesA} + ${countTooOldFilesD} ))
 
 # Check whether there are any files to process, exit the script if there are none.
+echo ${countTooOldFiles} files were not processed because the profiles in them were older than ${acceptableAge} days. 
 if [[ $countfiles -eq 0 ]] 
 then
   echo There are no files to process, exiting $0 ...
@@ -141,7 +193,8 @@ then
     else
       arrayofnetcdffilesnotproc+=("$fl")
       countnetcdfnotprocessed=$(( $countnetcdfnotprocessed+1 ))
-      echo -e "$fl was not processed successfully"
+      mv ${file} ${UNPROCESSEDNCDIR}
+      echo -e "$fl was not processed successfully, moved to ${UNPROCESSEDNCDIR}"
     fi
   done
 else
@@ -163,7 +216,8 @@ then
     else
       arrayofnetcdffilesnotproc+=("$fl")
       countnetcdfnotprocessed=$(( $countnetcdfnotprocessed+1 ))
-      echo -e "$fl was not processed successfully"
+      mv ${file} ${UNPROCESSEDNCDIR}
+      echo -e "$fl was not processed successfully, moved to ${UNPROCESSEDNCDIR}"
     fi
   done
 else
@@ -176,9 +230,10 @@ echo -e "\nSummary: "
 echo -e "${countfiles} netCDF files were processed, comprising ${countfilesA} ascending and ${countfilesD} descending profile files."
 echo -e "$countbufrfilesmade BUFR files were created and delivered to $BUFRDEST."
 echo -e "Comprising ${countbufrfilesmadeA} ascending and ${countbufrfilesmadeD} descending profiles."
+echo -e "${countTooOldFiles} netCDF files were not processed because their profiles were older than ${acceptableAge} days."
 if [[ $countnetcdfnotprocessed -gt 0 ]]
 then
-  echo -e "\n$countnetcdfnotprocessed netCDF files were not converted into BUFR."
+  echo -e "\n$countnetcdfnotprocessed other netCDF files were not converted into BUFR."
   echo -e "These are listed below ..."
   echo -e ${arrayofnetcdffilesnotproc[@]}
 fi
@@ -199,24 +254,24 @@ fi
 # FTP the BUFR files to MetSwitch
 countBUFRfilestomove=$(ls ${BUFRDEST}/*.dat 2>/dev/null | wc -l)
 bufrfilestohandle=$(ls ${BUFRDEST}/*.dat 2>/dev/null)
-#echo -e "\nFTPing ${countBUFRfilestomove} BUFR files to MetSwitch ${REMOTEHOSTBUFR}"
-#for f in ${bufrfilestohandle}
-#do
-#  bn=$(basename $f)
-#  ftp -n ${REMOTEHOSTBUFR} <<END_SCRIPT
-#  quote USER ${UNBUFR}
-#  quote PASS ${PWBUFR}
-#  put ${f} ${bn}.tmp  
-#  rename ${bn}.tmp ${bn}
-#  quit
-#END_SCRIPT
-#done
-#echo -e "Finished FTPing"
+echo -e "\nFTPing ${countBUFRfilestomove} BUFR files to MetSwitch ${REMOTEHOSTBUFR}"
+for f in ${bufrfilestohandle}
+do
+  bn=$(basename $f)
+  ftp -n ${REMOTEHOSTBUFR} <<END_SCRIPT
+  quote USER ${UNBUFR}
+  quote PASS ${PWBUFR}
+  put ${f} ${bn}.tmp  
+  rename ${bn}.tmp ${bn}
+  quit
+END_SCRIPT
+done
+echo -e "Finished FTPing"
 
 # 5b. 
 # write line to text file so I can send myself a daily report email
 # the last line of this setcion sends me an hourly email. This is too much info, now that the daily email is working.
-emailbodytext="${countfiles} netCDF files were processed into ${countBUFRfilestomove} BUFR files. These BUFR files were NOT sent to metswitch (${REMOTEHOSTBUFR}) at $(date +"%d/%m/%Y_%H:%M") - Python 3 test system."
+emailbodytext="${countfiles} netCDF files were processed into ${countBUFRfilestomove} BUFR files. These BUFR files were sent to metswitch (${REMOTEHOSTBUFR}) at $(date +"%d/%m/%Y_%H:%M") - Python 3 test system."
 #emailbodytext="${countfiles} netCDF files were processed into ${countBUFRfilestomove} BUFR files. These BUFR files were sent to metswitch (${REMOTEHOSTBUFR}) at $(date +"%d/%m/%Y_%H:%M")."
 echo "${emailbodytext}" >> hourly_report_argo_netcdf2bufr.txt 
 #echo "${emailbodytext}" | mail -s "report from Argo netCDF-to-BUFR py3 processing on exvmarproc01" fiona.carse@metoffice.gov.uk
