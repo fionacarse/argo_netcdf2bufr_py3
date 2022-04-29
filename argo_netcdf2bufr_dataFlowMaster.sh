@@ -6,7 +6,7 @@
 source /home/marinedg/.bash_profile
 
 module unload scitools
-module load scitools/production-os44-1
+module load scitools/production-os45-1
 pyver=$(which python)
 
 today=$(date +%Y%m%d)
