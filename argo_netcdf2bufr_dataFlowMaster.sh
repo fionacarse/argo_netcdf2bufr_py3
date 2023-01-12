@@ -5,8 +5,12 @@
 # Either / or also works, couldn't decide which one was best, so left both in.
 source /home/marinedg/.bash_profile
 
-module unload scitools
-module load scitools/production-os45-1
+# load up python 3
+# change to using conda access to Python 12/01/2023
+conda deactivate
+conda activate production-os46-1
+#module unload scitools
+#module load scitools/production-os45-1
 pyver=$(which python)
 
 today=$(date +%Y%m%d)
